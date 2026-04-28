@@ -1,0 +1,136 @@
+{
+  "base": [
+    { "label": "Reusable water bottle (1L+)", "category": "food_water" },
+    { "label": "Sunscreen SPF 30+", "category": "personal" },
+    { "label": "Sunglasses", "category": "personal" },
+    { "label": "Hat", "category": "clothing" },
+    { "label": "Sturdy hiking shoes", "category": "clothing" },
+    { "label": "Phone + charger", "category": "electronics" },
+    { "label": "Park entrance pass / receipt", "category": "documents" },
+    { "label": "ID and insurance card", "category": "documents" },
+    { "label": "First-aid kit", "category": "safety" },
+    { "label": "Headlamp or flashlight", "category": "safety" },
+    { "label": "Bug repellent", "category": "personal" },
+    { "label": "Lip balm", "category": "personal" },
+    { "label": "Daypack", "category": "personal" },
+    { "label": "Trail snacks", "category": "food_water" },
+    { "label": "Trail map / offline maps downloaded", "category": "navigation" }
+  ],
+  "by_climate": {
+    "alpine": [
+      { "label": "Insulating layer (fleece or puffy)", "category": "clothing" },
+      { "label": "Rain shell", "category": "clothing" },
+      { "label": "Warm hat & gloves", "category": "clothing" },
+      { "label": "Bear spray (where applicable)", "category": "safety" },
+      { "label": "Microspikes (shoulder season)", "category": "safety" }
+    ],
+    "desert": [
+      { "label": "Extra water (1 gallon/person/day)", "category": "food_water" },
+      { "label": "Electrolyte tablets", "category": "food_water" },
+      { "label": "Long-sleeve sun shirt", "category": "clothing" },
+      { "label": "Wide-brim hat", "category": "clothing" },
+      { "label": "Buff or neck gaiter", "category": "clothing" }
+    ],
+    "tropical": [
+      { "label": "Quick-dry clothing", "category": "clothing" },
+      { "label": "Reef-safe sunscreen", "category": "personal" },
+      { "label": "Snorkel set (optional)", "category": "personal" },
+      { "label": "Rain jacket", "category": "clothing" },
+      { "label": "Water shoes", "category": "clothing" }
+    ],
+    "subtropical": [
+      { "label": "Insect head net", "category": "safety" },
+      { "label": "Permethrin-treated clothing", "category": "clothing" },
+      { "label": "Rain shell", "category": "clothing" }
+    ],
+    "temperate": [
+      { "label": "Light rain jacket", "category": "clothing" },
+      { "label": "Tick repellent", "category": "safety" }
+    ],
+    "coastal": [
+      { "label": "Wind/rain shell", "category": "clothing" },
+      { "label": "Quick-dry pants", "category": "clothing" },
+      { "label": "Tide chart for the dates", "category": "documents" }
+    ],
+    "arctic": [
+      { "label": "Heavy insulated jacket", "category": "clothing" },
+      { "label": "Insulated waterproof boots", "category": "clothing" },
+      { "label": "Wool base layers", "category": "clothing" },
+      { "label": "Bear spray", "category": "safety" },
+      { "label": "Satellite communicator (Garmin inReach, etc.)", "category": "safety" }
+    ]
+  },
+  "by_season": {
+    "winter": [
+      { "label": "Insulated jacket", "category": "clothing" },
+      { "label": "Hand warmers", "category": "personal" },
+      { "label": "Thermos with hot drink", "category": "food_water" }
+    ],
+    "summer": [
+      { "label": "Cooling towel", "category": "personal" },
+      { "label": "Extra water bottles", "category": "food_water" }
+    ],
+    "spring": [
+      { "label": "Waterproof boots", "category": "clothing" },
+      { "label": "Trekking poles (mud / snow)", "category": "personal" }
+    ],
+    "fall": [
+      { "label": "Layers for swing temps", "category": "clothing" }
+    ]
+  },
+  "by_style": {
+    "camping": [
+      { "label": "Tent", "category": "camping" },
+      { "label": "Sleeping bag (rated for temps)", "category": "camping" },
+      { "label": "Sleeping pad", "category": "camping" },
+      { "label": "Camp stove + fuel", "category": "camping" },
+      { "label": "Cookware + utensils", "category": "camping" },
+      { "label": "Camp chairs", "category": "camping" },
+      { "label": "Lantern", "category": "camping" },
+      { "label": "Bear-proof food storage (if applicable)", "category": "camping" },
+      { "label": "Trash bags", "category": "camping" },
+      { "label": "Reservation confirmation", "category": "documents" }
+    ],
+    "hotel": [
+      { "label": "Lodging confirmation", "category": "documents" },
+      { "label": "Toiletries", "category": "personal" }
+    ],
+    "mixed": [
+      { "label": "Tent + bag (camping nights)", "category": "camping" },
+      { "label": "Lodging confirmation (hotel nights)", "category": "documents" },
+      { "label": "Toiletries", "category": "personal" }
+    ]
+  },
+  "by_activity": {
+    "Hiking": [
+      { "label": "Trekking poles", "category": "personal" },
+      { "label": "Blister care", "category": "safety" }
+    ],
+    "Backpacking": [
+      { "label": "Backpack (50–65L)", "category": "camping" },
+      { "label": "Water filter", "category": "food_water" },
+      { "label": "Backcountry permit", "category": "documents" }
+    ],
+    "Stargazing": [
+      { "label": "Red-light flashlight", "category": "electronics" },
+      { "label": "Binoculars", "category": "electronics" },
+      { "label": "Star chart app", "category": "electronics" }
+    ],
+    "Wildlife Watching": [
+      { "label": "Binoculars", "category": "electronics" },
+      { "label": "Telephoto camera (optional)", "category": "electronics" }
+    ],
+    "Swimming": [
+      { "label": "Swimsuit", "category": "clothing" },
+      { "label": "Towel", "category": "personal" }
+    ],
+    "Climbing": [
+      { "label": "Helmet", "category": "safety" },
+      { "label": "Harness + rope (if leading)", "category": "safety" }
+    ],
+    "Boating": [
+      { "label": "PFD (life jacket)", "category": "safety" },
+      { "label": "Dry bag", "category": "personal" }
+    ]
+  }
+}

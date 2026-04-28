@@ -1,0 +1,20 @@
+node_modules
+.next
+out
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+.vscode
+.idea
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# PWA — generated during build, not committed
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+public/swe-worker-*.js
+public/swe-worker-*.js.map

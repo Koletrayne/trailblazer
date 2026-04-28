@@ -1,0 +1,72 @@
+[
+  {
+    "id": "mighty5",
+    "label": "Utah Mighty Five",
+    "description": "Visit all five Utah national parks: Arches, Bryce Canyon, Canyonlands, Capitol Reef, and Zion.",
+    "parkCodes": ["arch", "brca", "cany", "care", "zion"],
+    "icon": "mountain"
+  },
+  {
+    "id": "alaska",
+    "label": "Far North",
+    "description": "Reach all eight Alaska national parks.",
+    "parkCodes": ["dena", "gaar", "glba", "katm", "kefj", "kova", "lacl", "wrst"],
+    "icon": "snowflake"
+  },
+  {
+    "id": "desert_southwest",
+    "label": "Desert Southwest",
+    "description": "Explore the iconic desert parks of the Southwest.",
+    "parkCodes": ["arch", "brca", "cany", "care", "zion", "grca", "meve", "pefo", "sagu", "whsa", "jotr"],
+    "icon": "sun"
+  },
+  {
+    "id": "volcanoes",
+    "label": "Fire & Stone",
+    "description": "Stand on a volcano: Crater Lake, Hawai'i Volcanoes, Haleakalā, Lassen Volcanic.",
+    "parkCodes": ["crla", "havo", "hale", "lavo"],
+    "icon": "flame"
+  },
+  {
+    "id": "tropical",
+    "label": "Tropical Trio",
+    "description": "Hit the tropical parks: Virgin Islands, Hawai'i Volcanoes, Haleakalā, Dry Tortugas, American Samoa.",
+    "parkCodes": ["viis", "havo", "hale", "drto", "npsa"],
+    "icon": "palm"
+  },
+  {
+    "id": "rockies",
+    "label": "Rocky Roamer",
+    "description": "Climb high in the Rockies: Rocky Mountain, Grand Teton, Yellowstone, Glacier, Black Canyon.",
+    "parkCodes": ["romo", "grte", "yell", "glac", "blca"],
+    "icon": "peak"
+  },
+  {
+    "id": "pacific",
+    "label": "Pacific Pioneer",
+    "description": "All California parks plus Oregon's Crater Lake.",
+    "parkCodes": ["yose", "seki", "kica", "redw", "lavo", "pinn", "jotr", "deva", "chis", "crla"],
+    "icon": "wave"
+  },
+  {
+    "id": "east",
+    "label": "East Coast Explorer",
+    "description": "Eastern seaboard parks: Acadia, Shenandoah, Great Smoky Mountains, Congaree, Everglades, Biscayne, Dry Tortugas.",
+    "parkCodes": ["acad", "shen", "grsm", "cong", "ever", "bisc", "drto"],
+    "icon": "tree"
+  },
+  {
+    "id": "midwest",
+    "label": "Heartland Hiker",
+    "description": "Midwest national parks: Cuyahoga Valley, Indiana Dunes, Voyageurs, Isle Royale, Gateway Arch, Theodore Roosevelt, Wind Cave, Badlands.",
+    "parkCodes": ["cuva", "indu", "voya", "isro", "jeff", "thro", "wica", "badl"],
+    "icon": "wheat"
+  },
+  {
+    "id": "all63",
+    "label": "Grand Slam",
+    "description": "Visit every U.S. National Park.",
+    "parkCodes": [],
+    "icon": "trophy"
+  }
+]

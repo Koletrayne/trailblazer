@@ -1,0 +1,87 @@
+{
+  "_default_by_climate": {
+    "alpine": {
+      "bestMonths": [6, 7, 8, 9],
+      "shoulderMonths": [5, 10],
+      "avoidMonths": [11, 12, 1, 2, 3, 4],
+      "cautions": {
+        "winter": ["Heavy snow closes most roads and trails", "Sub-zero temps possible"],
+        "spring": ["Snowmelt floods, road closures linger into June", "Trails may be icy"],
+        "summer": ["Afternoon thunderstorms", "Crowds peak in July/August"],
+        "fall": ["Early snowstorms after mid-September", "Wildlife rutting season — keep distance"]
+      }
+    },
+    "desert": {
+      "bestMonths": [3, 4, 5, 10, 11],
+      "shoulderMonths": [2, 9, 12],
+      "avoidMonths": [6, 7, 8],
+      "cautions": {
+        "summer": ["Dangerous heat — over 100°F daily", "Carry 1 gallon water per person per day", "Hike at dawn or dusk only"],
+        "winter": ["Cold nights, possible snow at elevation", "Short daylight hours"],
+        "spring": ["Flash flood risk in slot canyons", "Wind storms"],
+        "fall": ["Last warm window before winter; book early"]
+      }
+    },
+    "tropical": {
+      "bestMonths": [12, 1, 2, 3, 4],
+      "shoulderMonths": [5, 11],
+      "avoidMonths": [6, 7, 8, 9, 10],
+      "cautions": {
+        "summer": ["Hurricane season June–November", "Extreme humidity"],
+        "fall": ["Peak hurricane risk September–October"],
+        "spring": ["Stinging jellyfish in some waters"],
+        "winter": ["Best weather; book lodging far ahead"]
+      }
+    },
+    "subtropical": {
+      "bestMonths": [11, 12, 1, 2, 3, 4],
+      "shoulderMonths": [5, 10],
+      "avoidMonths": [6, 7, 8, 9],
+      "cautions": {
+        "summer": ["Mosquitoes intense", "Daily afternoon thunderstorms", "Hurricane risk"],
+        "fall": ["Hurricane season tapers in November"],
+        "winter": ["Dry season, ideal for hiking"]
+      }
+    },
+    "temperate": {
+      "bestMonths": [5, 6, 9, 10],
+      "shoulderMonths": [4, 7, 8, 11],
+      "avoidMonths": [12, 1, 2, 3],
+      "cautions": {
+        "winter": ["Some roads may close after snow", "Short days"],
+        "summer": ["Crowds peak; ticks and biting insects active"],
+        "spring": ["Trail mud, wet weather"],
+        "fall": ["Leaf-peeping crowds in October"]
+      }
+    },
+    "coastal": {
+      "bestMonths": [6, 7, 8, 9],
+      "shoulderMonths": [5, 10],
+      "avoidMonths": [12, 1, 2],
+      "cautions": {
+        "winter": ["Storms, rough seas, wind", "Some roads close"],
+        "spring": ["Cool, foggy mornings"],
+        "summer": ["Peak crowds; reservations required at popular sites"],
+        "fall": ["Storms return late October"]
+      }
+    },
+    "arctic": {
+      "bestMonths": [6, 7, 8],
+      "shoulderMonths": [5, 9],
+      "avoidMonths": [10, 11, 12, 1, 2, 3, 4],
+      "cautions": {
+        "summer": ["Mosquitoes brutal in June/July", "Long daylight (midnight sun)", "Variable weather — pack for any conditions"],
+        "winter": ["Dangerous cold, limited access, polar night", "Most facilities closed"],
+        "spring": ["Snow and ice persist", "River crossings dangerous"],
+        "fall": ["Brief window before snow returns"]
+      }
+    }
+  },
+  "_overrides": {
+    "deva": { "bestMonths": [11, 12, 1, 2, 3, 4], "avoidMonths": [6, 7, 8, 9] },
+    "drto": { "bestMonths": [12, 1, 2, 3, 4], "avoidMonths": [6, 7, 8, 9, 10] },
+    "ever": { "bestMonths": [12, 1, 2, 3], "avoidMonths": [6, 7, 8, 9] },
+    "yell": { "bestMonths": [6, 7, 8, 9], "shoulderMonths": [5, 10], "avoidMonths": [11, 12, 1, 2, 3, 4] },
+    "glac": { "bestMonths": [7, 8, 9], "shoulderMonths": [6, 10], "avoidMonths": [11, 12, 1, 2, 3, 4, 5] }
+  }
+}
