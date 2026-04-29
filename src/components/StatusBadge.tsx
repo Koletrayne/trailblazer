@@ -17,7 +17,7 @@ const LABEL: Record<Status, string> = {
 export default function StatusBadge({ status, size = "sm" }: { status: Status; size?: "sm" | "md" }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full ${COLORS[status]} ${
+      className={`inline-flex items-center rounded-full whitespace-nowrap shrink-0 ${COLORS[status]} ${
         size === "sm" ? "text-xs px-2 py-0.5" : "text-sm px-3 py-1"
       } font-medium`}
     >

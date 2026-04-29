@@ -32,24 +32,61 @@ function PinLayer({
 }) {
   const map = useMap();
   const layerRef = useRef<L.LayerGroup | null>(null);
+  const markersRef = useRef<Map<string, L.Marker>>(new Map());
 
+  // Initialize layer once
   useEffect(() => {
-    if (!layerRef.current) {
-      layerRef.current = L.layerGroup().addTo(map);
-    }
+    layerRef.current = L.layerGroup().addTo(map);
+    return () => {
+      layerRef.current?.remove();
+      layerRef.current = null;
+      markersRef.current.clear();
+    };
+  }, [map]);
+
+  // Add/remove markers when the parks list changes
+  useEffect(() => {
     const layer = layerRef.current;
-    layer.clearLayers();
-    parks.forEach((p) => {
-      if (Number.isNaN(p.latitude) || Number.isNaN(p.longitude)) return;
+    if (!layer) return;
+    const markers = markersRef.current;
+    const newCodes = new Set(parks.map((p) => p.parkCode));
+
+    // Remove markers no longer in the filtered list
+    for (const [code, marker] of markers) {
+      if (!newCodes.has(code)) {
+        layer.removeLayer(marker);
+        markers.delete(code);
+      }
+    }
+
+    // Add markers for newly visible parks
+    for (const p of parks) {
+      if (markers.has(p.parkCode)) continue;
+      if (Number.isNaN(p.latitude) || Number.isNaN(p.longitude)) continue;
       const marker = L.marker([p.latitude, p.longitude], { icon: makeIcon(statusOf(p.parkCode)) });
-      marker.on("click", () => onSelect(p));
       marker.bindTooltip(p.fullName, { direction: "top", offset: [0, -8] });
       marker.addTo(layer);
-    });
-    return () => {
-      layer.clearLayers();
-    };
-  }, [parks, statusOf, onSelect, map]);
+      markers.set(p.parkCode, marker);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parks, map]);
+
+  // Update click handlers whenever onSelect changes
+  useEffect(() => {
+    for (const [code, marker] of markersRef.current) {
+      const park = parks.find((p) => p.parkCode === code);
+      if (!park) continue;
+      marker.off("click");
+      marker.on("click", () => onSelect(park));
+    }
+  }, [parks, onSelect]);
+
+  // Update icons in-place when status changes — no flash, no clear
+  useEffect(() => {
+    for (const [code, marker] of markersRef.current) {
+      marker.setIcon(makeIcon(statusOf(code)));
+    }
+  }, [statusOf]);
 
   return null;
 }
