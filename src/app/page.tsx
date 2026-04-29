@@ -14,6 +14,7 @@ export default function HomePage() {
   const { getStatus } = useStatuses();
   const [selected, setSelected] = useState<Park | null>(null);
   const [filters, setFilters] = useState<Filters>({ search: "", state: "", status: "all" });
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const states = useMemo(() => {
     const s = new Set<string>();
@@ -32,17 +33,59 @@ export default function HomePage() {
   }, [parks, filters, getStatus]);
 
   return (
-    <div className="flex h-[calc(100vh-64px)]">
-      <aside className="w-80 flex flex-col border-r border-bark-100 dark:border-forest-800 bg-white dark:bg-forest-900">
+    <div className="flex h-[calc(100vh-64px)] relative">
+      {/* Desktop sidebar — hidden on mobile */}
+      <aside className="hidden md:flex w-80 flex-col border-r border-bark-100 dark:border-forest-800 bg-white dark:bg-forest-900">
         <FilterBar filters={filters} setFilters={setFilters} states={states} total={filteredParks.length} />
         <div className="flex-1 overflow-hidden">
           <ParkSidebar parks={filteredParks} statusOf={getStatus} onSelect={setSelected} loading={loading} />
         </div>
         <Legend />
       </aside>
+
+      {/* Map — full width on mobile */}
       <div className="flex-1 relative">
         <ParkMapWrapper parks={filteredParks} statusOf={getStatus} onSelect={setSelected} />
+
+        {/* Floating button to open parks list on mobile */}
+        <button
+          onClick={() => setSheetOpen(true)}
+          className="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-forest-800 text-white px-5 py-2.5 rounded-full shadow-lg text-sm font-semibold flex items-center gap-2"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          Parks List ({filteredParks.length})
+        </button>
       </div>
+
+      {/* Mobile bottom sheet */}
+      {sheetOpen && (
+        <div className="md:hidden fixed inset-0 z-[2000] flex flex-col justify-end">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSheetOpen(false)} />
+          <div className="relative bg-white dark:bg-forest-900 rounded-t-2xl flex flex-col" style={{ height: "72vh" }}>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-bark-100 dark:border-forest-800">
+              <span className="text-sm font-semibold text-forest-800 dark:text-forest-100">National Parks</span>
+              <button onClick={() => setSheetOpen(false)} className="p-1 text-bark-500 dark:text-forest-300">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <FilterBar filters={filters} setFilters={setFilters} states={states} total={filteredParks.length} />
+            <div className="flex-1 overflow-hidden">
+              <ParkSidebar
+                parks={filteredParks}
+                statusOf={getStatus}
+                onSelect={(p) => { setSelected(p); setSheetOpen(false); }}
+                loading={loading}
+              />
+            </div>
+            <Legend />
+          </div>
+        </div>
+      )}
+
       {selected && (
         <ParkPreviewModal park={selected} status={getStatus(selected.parkCode)} onClose={() => setSelected(null)} />
       )}
