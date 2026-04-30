@@ -141,6 +141,15 @@ export async function getAllParks(): Promise<Park[]> {
   if (collected.length === 0) {
     return parksFromSeed();
   }
+  // Supplement with any National Park codes the NPS API didn't return.
+  // (e.g. Kings Canyon `kica` is bundled into Sequoia `seki` in the API.)
+  const collectedCodes = new Set(collected.map((p) => p.parkCode));
+  const seed = parksFromSeed();
+  for (const seedPark of seed) {
+    if (NATIONAL_PARK_CODES.has(seedPark.parkCode) && !collectedCodes.has(seedPark.parkCode)) {
+      collected.push(seedPark);
+    }
+  }
   return collected.sort((a, b) => a.fullName.localeCompare(b.fullName));
 }
 
