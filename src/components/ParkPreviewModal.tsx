@@ -29,10 +29,12 @@ export default function ParkPreviewModal({
     campgrounds: []
   });
   const [loading, setLoading] = useState(true);
+  const [galleryIndex, setGalleryIndex] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setGalleryIndex(0);
     setDetail({ park, alerts: [], thingsToDo: [], campgrounds: [] });
     fetch(`/api/parks/${park.parkCode}`)
       .then((r) => r.json())
@@ -64,7 +66,11 @@ export default function ParkPreviewModal({
   }, [onClose]);
 
   const p = detail.park;
-  const heroImage = p.images?.[0]?.url;
+  const images = p.images ?? [];
+  const currentImage = images[galleryIndex];
+  const hasMultiple = images.length > 1;
+  const goPrev = () => setGalleryIndex((i) => (i - 1 + images.length) % images.length);
+  const goNext = () => setGalleryIndex((i) => (i + 1) % images.length);
 
   return (
     <div
@@ -76,15 +82,29 @@ export default function ParkPreviewModal({
         className="bg-white dark:bg-forest-900 rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-bark-100 dark:border-forest-700 my-4"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Hero */}
+        {/* Gallery hero */}
         <div className="relative h-56 sm:h-72 bg-forest-900">
-          {heroImage ? (
+          {currentImage ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={heroImage} alt={p.fullName} className="h-full w-full object-cover" />
+            <img
+              key={currentImage.url}
+              src={currentImage.url}
+              alt={currentImage.altText || p.fullName}
+              className="h-full w-full object-cover"
+            />
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-forest-700 to-forest-900" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+
+          {/* Image counter */}
+          {hasMultiple && (
+            <div className="absolute top-3 left-3 bg-black/50 text-white text-xs font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm">
+              {galleryIndex + 1} / {images.length}
+            </div>
+          )}
+
+          {/* Close */}
           <button
             onClick={onClose}
             className="absolute top-3 right-3 bg-black/40 hover:bg-black/60 text-white rounded-full w-9 h-9 flex items-center justify-center text-2xl leading-none backdrop-blur-sm"
@@ -92,6 +112,27 @@ export default function ParkPreviewModal({
           >
             ×
           </button>
+
+          {/* Gallery arrows */}
+          {hasMultiple && (
+            <>
+              <button
+                onClick={goPrev}
+                className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full w-9 h-9 flex items-center justify-center text-xl backdrop-blur-sm transition-colors"
+                aria-label="Previous photo"
+              >
+                ‹
+              </button>
+              <button
+                onClick={goNext}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full w-9 h-9 flex items-center justify-center text-xl backdrop-blur-sm transition-colors"
+                aria-label="Next photo"
+              >
+                ›
+              </button>
+            </>
+          )}
+
           <div className="absolute inset-x-0 bottom-0 p-5 text-white">
             <h2 className="font-display font-bold text-2xl sm:text-3xl drop-shadow-md">
               {p.fullName}

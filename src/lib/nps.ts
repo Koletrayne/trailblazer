@@ -153,6 +153,27 @@ export async function getAllParks(): Promise<Park[]> {
   return collected.sort((a, b) => a.fullName.localeCompare(b.fullName));
 }
 
+/** Fetch every National Monument from the NPS API. */
+export async function getAllMonuments(): Promise<Park[]> {
+  const collected: Park[] = [];
+  let start = 0;
+  const pageSize = 100;
+  while (true) {
+    const res = await npsFetch<RawPark>("/parks", { limit: pageSize, start });
+    const batch = res.data ?? [];
+    if (batch.length === 0) break;
+    for (const p of batch) {
+      if (p.designation && p.designation.includes("National Monument")) {
+        collected.push(normalizePark(p));
+      }
+    }
+    if (batch.length < pageSize) break;
+    start += pageSize;
+    if (start > 800) break;
+  }
+  return collected.sort((a, b) => a.fullName.localeCompare(b.fullName));
+}
+
 export async function getPark(parkCode: string): Promise<Park | null> {
   const res = await npsFetch<RawPark>("/parks", { parkCode, limit: 1 });
   const raw = res.data?.[0];

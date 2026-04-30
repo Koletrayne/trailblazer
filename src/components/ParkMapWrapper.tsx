@@ -17,6 +17,8 @@ export default function ParkMapWrapper(props: {
   parks: Park[];
   statusOf: (code: string) => Status;
   onSelect: (p: Park) => void;
+  monuments?: Park[];
+  onSelectMonument?: (m: Park) => void;
 }) {
   return <ParkMap {...props} />;
 }

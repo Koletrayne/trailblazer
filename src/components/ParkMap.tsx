@@ -21,6 +21,70 @@ function makeIcon(status: Status) {
   });
 }
 
+function makeMonumentIcon() {
+  return L.divIcon({
+    html: `<div style="width:12px;height:12px;background:#c9762e;border:2px solid white;border-radius:2px;transform:rotate(45deg);box-shadow:0 1px 3px rgba(0,0,0,0.4)"></div>`,
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
+    className: "tb-monument-marker"
+  });
+}
+
+function MonumentLayer({
+  monuments,
+  onSelect
+}: {
+  monuments: Park[];
+  onSelect: (m: Park) => void;
+}) {
+  const map = useMap();
+  const layerRef = useRef<L.LayerGroup | null>(null);
+  const markersRef = useRef<Map<string, L.Marker>>(new Map());
+
+  useEffect(() => {
+    layerRef.current = L.layerGroup().addTo(map);
+    return () => {
+      layerRef.current?.remove();
+      layerRef.current = null;
+      markersRef.current.clear();
+    };
+  }, [map]);
+
+  useEffect(() => {
+    const layer = layerRef.current;
+    if (!layer) return;
+    const markers = markersRef.current;
+    const newCodes = new Set(monuments.map((m) => m.parkCode));
+
+    for (const [code, marker] of markers) {
+      if (!newCodes.has(code)) {
+        layer.removeLayer(marker);
+        markers.delete(code);
+      }
+    }
+
+    for (const m of monuments) {
+      if (markers.has(m.parkCode)) continue;
+      if (Number.isNaN(m.latitude) || Number.isNaN(m.longitude)) continue;
+      const marker = L.marker([m.latitude, m.longitude], { icon: makeMonumentIcon() });
+      marker.bindTooltip(m.fullName, { direction: "top", offset: [0, -8] });
+      marker.addTo(layer);
+      markers.set(m.parkCode, marker);
+    }
+  }, [monuments]);
+
+  useEffect(() => {
+    for (const [code, marker] of markersRef.current) {
+      const monument = monuments.find((m) => m.parkCode === code);
+      if (!monument) continue;
+      marker.off("click");
+      marker.on("click", () => onSelect(monument));
+    }
+  }, [monuments, onSelect]);
+
+  return null;
+}
+
 function PinLayer({
   parks,
   statusOf,
@@ -94,11 +158,15 @@ function PinLayer({
 export default function ParkMap({
   parks,
   statusOf,
-  onSelect
+  onSelect,
+  monuments,
+  onSelectMonument
 }: {
   parks: Park[];
   statusOf: (code: string) => Status;
   onSelect: (p: Park) => void;
+  monuments?: Park[];
+  onSelectMonument?: (m: Park) => void;
 }) {
   return (
     <MapContainer
@@ -115,6 +183,9 @@ export default function ParkMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <PinLayer parks={parks} statusOf={statusOf} onSelect={onSelect} />
+      {monuments && onSelectMonument && (
+        <MonumentLayer monuments={monuments} onSelect={onSelectMonument} />
+      )}
     </MapContainer>
   );
 }

@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useParks } from "@/hooks/useParks";
+import { useMonuments } from "@/hooks/useMonuments";
 import { useStatuses } from "@/hooks/useStatuses";
 import ParkMapWrapper from "@/components/ParkMapWrapper";
 import ParkSidebar from "@/components/ParkSidebar";
 import ParkPreviewModal from "@/components/ParkPreviewModal";
+import MonumentModal from "@/components/MonumentModal";
 import FilterBar, { type Filters } from "@/components/FilterBar";
 import type { Park } from "@/types";
 
@@ -13,8 +15,11 @@ export default function HomePage() {
   const { parks, loading } = useParks();
   const { getStatus } = useStatuses();
   const [selected, setSelected] = useState<Park | null>(null);
+  const [selectedMonument, setSelectedMonument] = useState<Park | null>(null);
   const [filters, setFilters] = useState<Filters>({ search: "", state: "", status: "all" });
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [showMonuments, setShowMonuments] = useState(false);
+  const { monuments } = useMonuments(showMonuments);
 
   const states = useMemo(() => {
     const s = new Set<string>();
@@ -45,7 +50,27 @@ export default function HomePage() {
 
       {/* Map — full width on mobile */}
       <div className="flex-1 relative">
-        <ParkMapWrapper parks={filteredParks} statusOf={getStatus} onSelect={setSelected} />
+        <ParkMapWrapper
+          parks={filteredParks}
+          statusOf={getStatus}
+          onSelect={setSelected}
+          monuments={showMonuments ? monuments : []}
+          onSelectMonument={setSelectedMonument}
+        />
+
+        {/* Monument toggle — top right of map */}
+        <button
+          onClick={() => setShowMonuments((o) => !o)}
+          className={`absolute top-3 right-3 z-[1000] flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold shadow-md border transition-colors ${
+            showMonuments
+              ? "bg-amber-600 text-white border-amber-700"
+              : "bg-white dark:bg-forest-800 text-bark-700 dark:text-forest-100 border-bark-200 dark:border-forest-700 hover:bg-cream dark:hover:bg-forest-700"
+          }`}
+          aria-pressed={showMonuments}
+        >
+          <span>🏛</span>
+          <span>{showMonuments ? `Monuments (${monuments.length})` : "Show Monuments"}</span>
+        </button>
 
         {/* Floating button to open parks list on mobile */}
         <button
@@ -89,6 +114,10 @@ export default function HomePage() {
       {selected && (
         <ParkPreviewModal park={selected} status={getStatus(selected.parkCode)} onClose={() => setSelected(null)} />
       )}
+
+      {selectedMonument && (
+        <MonumentModal monument={selectedMonument} onClose={() => setSelectedMonument(null)} />
+      )}
     </div>
   );
 }
@@ -100,6 +129,10 @@ function Legend() {
       <Dot color="#3b7bd0" /> Planned
       <Dot color="#d4a437" /> Wishlist
       <Dot color="#8b8378" /> Not visited
+      <span className="inline-flex items-center gap-1">
+        <span style={{ background: "#c9762e", border: "1.5px solid white", borderRadius: "2px", transform: "rotate(45deg)" }} className="inline-block w-2 h-2" />
+        Monument
+      </span>
     </div>
   );
 }
