@@ -38,9 +38,23 @@ async function npsFetch<T>(path: string, params: Record<string, string | number>
   return (await res.json()) as NpsListResponse<T>;
 }
 
-function isNationalPark(designation: string): boolean {
-  if (!designation) return false;
-  return designation === "National Park" || designation.includes("National Park");
+// Authoritative list of all 63 US National Park codes.
+// Using a code-based allowlist avoids NPS API designation mismatches
+// (e.g. Redwood is returned as "National and State Parks", not "National Park").
+const NATIONAL_PARK_CODES = new Set([
+  "acad", "arch", "badl", "bibe", "bisc", "blca", "brca", "cany", "care", "cave",
+  "chis", "cong", "crla", "cuva", "deva", "dena", "drto", "ever", "gaar", "jeff",
+  "glac", "glba", "grca", "grte", "grba", "grsa", "grsm", "gumo", "hale", "havo",
+  "hosp", "indu", "isro", "jotr", "katm", "kefj", "kica", "kova", "lacl", "lavo",
+  "maca", "meve", "mora", "neri", "noca", "olym", "pefo", "pinn", "redw", "romo",
+  "sagu", "seki", "shen", "thro", "viis", "voya", "whsa", "wica", "wrst", "yell",
+  "yose", "zion", "npsa"
+]);
+
+function isNationalPark(parkCode: string, designation: string): boolean {
+  return NATIONAL_PARK_CODES.has(parkCode) ||
+    designation === "National Park" ||
+    designation.includes("National Park");
 }
 
 type RawPark = {
@@ -118,7 +132,7 @@ export async function getAllParks(): Promise<Park[]> {
     const batch = res.data ?? [];
     if (batch.length === 0) break;
     for (const p of batch) {
-      if (isNationalPark(p.designation)) collected.push(normalizePark(p));
+      if (isNationalPark(p.parkCode, p.designation)) collected.push(normalizePark(p));
     }
     if (batch.length < pageSize) break;
     start += pageSize;
