@@ -13,6 +13,8 @@ import GearChecklist from "@/components/GearChecklist";
 import { generateGearChecklist } from "@/lib/gearRules";
 import { estimateTripCost, type CostOverrides } from "@/lib/tripCost";
 import { currentSeason, seasonForMonth } from "@/lib/seasonRules";
+import { suggestNearbyParks } from "@/lib/nearbyParks";
+import { formatHours } from "@/lib/distance";
 import type { TripStyle } from "@/types";
 
 export default function TripDetailPage() {
@@ -20,7 +22,7 @@ export default function TripDetailPage() {
   const id = params.id;
   const { trips, getTrip, updateTrip, reorderStops, setGear, setStyle, deleteTrip } = useTrips();
   const { parks, loading } = useParks();
-  const { setStatus } = useStatuses();
+  const { statuses, setStatus } = useStatuses();
   const [pickerQuery, setPickerQuery] = useState("");
   const [pickerState, setPickerState] = useState("");
   const [mpg, setMpg] = useState(24);
@@ -35,6 +37,15 @@ export default function TripDetailPage() {
       .map((c) => parks.find((p) => p.parkCode === c))
       .filter((p): p is NonNullable<typeof p> => Boolean(p));
   }, [trip, parks]);
+
+  const nearbySuggestions = useMemo(() => {
+    if (!trip || orderedParks.length === 0) return [];
+    const anchor = orderedParks[orderedParks.length - 1];
+    const month = trip.startDate
+      ? new Date(trip.startDate).getMonth() + 1
+      : new Date().getMonth() + 1;
+    return suggestNearbyParks(anchor, parks, trip.parkCodes, statuses, month);
+  }, [trip, orderedParks, parks, statuses]);
 
   const cost = useMemo(() => {
     if (!trip) return null;
@@ -228,6 +239,45 @@ export default function TripDetailPage() {
               onRemove={removeStop}
               onNightsChange={updateStopNights}
             />
+
+            {nearbySuggestions.length > 0 && (
+              <div className="mt-5 border-t border-bark-100 dark:border-forest-800 pt-4">
+                <div className="text-xs uppercase tracking-wide text-bark-500 dark:text-forest-300 mb-1 font-semibold">
+                  Chain a nearby park
+                </div>
+                <p className="text-xs text-bark-500 dark:text-forest-300 mb-3">
+                  Within ~2 hrs of {orderedParks[orderedParks.length - 1].name}.
+                </p>
+                <div className="space-y-2">
+                  {nearbySuggestions.map((s) => {
+                    const reasons: string[] = [`${formatHours(s.hours)} away`];
+                    if (s.inPeakSeason) reasons.push("peak season");
+                    if (s.notVisited) reasons.push("new for you");
+                    return (
+                      <div
+                        key={s.park.parkCode}
+                        className="flex items-center justify-between gap-3 rounded-lg bg-cream dark:bg-forest-800/60 border border-bark-100 dark:border-forest-700 px-3 py-2"
+                      >
+                        <div className="min-w-0">
+                          <div className="text-sm font-semibold text-bark-800 dark:text-forest-100 truncate">
+                            {s.park.fullName}
+                          </div>
+                          <div className="text-xs text-bark-500 dark:text-forest-300">
+                            {reasons.join(" · ")}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => addPark(s.park.parkCode)}
+                          className="flex-shrink-0 text-xs bg-forest-600 hover:bg-forest-700 text-white font-semibold px-3 py-1.5 rounded-full"
+                        >
+                          + add
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <div className="mt-5 border-t border-bark-100 dark:border-forest-800 pt-4">
               <div className="text-xs uppercase tracking-wide text-bark-500 dark:text-forest-300 mb-2 font-semibold">Add a park</div>
