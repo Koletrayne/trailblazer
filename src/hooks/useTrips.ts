@@ -1,7 +1,7 @@
 "use client";
 
 import { useStored, STORAGE_KEYS } from "@/lib/storage";
-import type { GearItem, Trip, TripStyle, RouteStop } from "@/types";
+import type { GearItem, Trip, TripStyle, RouteStop, ItineraryItem } from "@/types";
 
 function newId() {
   return `trip-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -60,6 +60,30 @@ export function useTrips() {
     updateTrip(id, { style });
   }
 
+  function addItineraryItem(id: string, item: ItineraryItem) {
+    setTrips((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, itinerary: [...(t.itinerary ?? []), item] } : t))
+    );
+  }
+
+  function removeItineraryItem(id: string, itemId: string) {
+    setTrips((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, itinerary: (t.itinerary ?? []).filter((x) => x.id !== itemId) } : t
+      )
+    );
+  }
+
+  function updateItineraryItem(id: string, itemId: string, patch: Partial<ItineraryItem>) {
+    setTrips((prev) =>
+      prev.map((t) =>
+        t.id === id
+          ? { ...t, itinerary: (t.itinerary ?? []).map((x) => (x.id === itemId ? { ...x, ...patch } : x)) }
+          : t
+      )
+    );
+  }
+
   return {
     trips,
     createTrip,
@@ -68,6 +92,9 @@ export function useTrips() {
     getTrip,
     reorderStops,
     setGear,
-    setStyle
+    setStyle,
+    addItineraryItem,
+    removeItineraryItem,
+    updateItineraryItem
   };
 }

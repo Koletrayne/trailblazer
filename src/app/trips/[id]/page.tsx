@@ -9,6 +9,7 @@ import { useGeocode } from "@/hooks/useGeocode";
 import { useStatuses } from "@/hooks/useStatuses";
 import TripStopList from "@/components/TripStopList";
 import TripRouteMapWrapper from "@/components/TripRouteMapWrapper";
+import TripItinerary from "@/components/TripItinerary";
 import GearChecklist from "@/components/GearChecklist";
 import { generateGearChecklist } from "@/lib/gearRules";
 import { estimateTripCost, type CostOverrides } from "@/lib/tripCost";
@@ -27,6 +28,7 @@ export default function TripDetailPage() {
   const [pickerState, setPickerState] = useState("");
   const [mpg, setMpg] = useState(24);
   const [gasPerGallon, setGasPerGallon] = useState(3.6);
+  const [view, setView] = useState<"planner" | "itinerary">("planner");
 
   const trip = getTrip(id);
   const startCoord = useGeocode(trip?.startLocation ?? "");
@@ -224,6 +226,25 @@ export default function TripDetailPage() {
         </Field>
       </div>
 
+      <div className="flex gap-1 border-b border-bark-100 dark:border-forest-800">
+        {(["planner", "itinerary"] as const).map((v) => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            className={`px-4 py-2 text-sm font-medium capitalize border-b-2 -mb-px transition-colors ${
+              view === v
+                ? "border-forest-600 text-forest-700 dark:text-forest-200"
+                : "border-transparent text-bark-500 dark:text-forest-300 hover:text-forest-700 dark:hover:text-forest-100"
+            }`}
+          >
+            {v}
+          </button>
+        ))}
+      </div>
+
+      {view === "itinerary" && <TripItinerary trip={trip} parks={parks} />}
+
+      {view === "planner" && (
       <div className="grid lg:grid-cols-[1fr_360px] gap-6">
         <div className="space-y-6">
           <Card title={`Route · ${orderedParks.length} stop${orderedParks.length === 1 ? "" : "s"} · ~${cost?.miles ?? 0} mi`}>
@@ -436,6 +457,7 @@ export default function TripDetailPage() {
           </Card>
         </aside>
       </div>
+      )}
     </div>
   );
 }

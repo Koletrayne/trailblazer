@@ -9,6 +9,7 @@ import { useStatuses } from "@/hooks/useStatuses";
 import { CATEGORY_LABEL, CATEGORY_ORDER } from "@/lib/gearRules";
 import { approximateDriveMiles, approximateDriveHours, formatHours } from "@/lib/distance";
 import { estimateTripCost } from "@/lib/tripCost";
+import { buildDaySchedule, formatDayDate } from "@/lib/itinerary";
 
 export default function TripPrintPage() {
   const params = useParams<{ id: string }>();
@@ -45,6 +46,12 @@ export default function TripPrintPage() {
     if (!groupedGear.has(item.category)) groupedGear.set(item.category, []);
     groupedGear.get(item.category)!.push(item);
   }
+
+  const schedule = buildDaySchedule(trip);
+  const itinerary = trip.itinerary ?? [];
+  const hasItinerary = itinerary.length > 0;
+  const parkName = (code: string) =>
+    parks.find((p) => p.parkCode === code)?.fullName ?? code;
 
   return (
     <div className="bg-white text-black min-h-screen">
@@ -107,6 +114,36 @@ export default function TripPrintPage() {
             })}
           </ol>
         </Section>
+
+        {hasItinerary && (
+          <Section title="Daily itinerary">
+            <div className="space-y-3">
+              {schedule.map((day) => {
+                const items = itinerary.filter((i) => i.day === day.dayNumber);
+                if (items.length === 0) return null;
+                const dateLabel = formatDayDate(day.date);
+                return (
+                  <div key={day.dayNumber} className="break-inside-avoid">
+                    <div className="font-semibold text-bark-800 text-sm">
+                      Day {day.dayNumber}
+                      {dateLabel && <span className="font-normal text-bark-500"> · {dateLabel}</span>}
+                      <span className="font-normal text-bark-500"> · {parkName(day.parkCode)}</span>
+                      {day.isTravelDay && <span className="font-normal text-bark-500 italic"> · travel day</span>}
+                    </div>
+                    <ul className="ml-4 mt-1 space-y-0.5">
+                      {items.map((item) => (
+                        <li key={item.id} className="flex items-start gap-2 text-sm text-bark-700">
+                          <span className="w-3 h-3 border border-bark-700 rounded-sm inline-block mt-1 flex-shrink-0" />
+                          <span>{item.title}{item.note ? ` — ${item.note}` : ""}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          </Section>
+        )}
 
         {cost && (
           <Section title="Estimated cost">

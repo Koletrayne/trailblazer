@@ -107,6 +107,16 @@ export type RouteStop = {
 
 export type TripStyle = "camping" | "hotel" | "mixed";
 
+export type ItineraryItem = {
+  id: string;
+  day: number;
+  parkCode: string;
+  /** NPS thingstodo id when added from Hikes & Things To Do; absent for custom items. */
+  thingId?: string;
+  title: string;
+  note?: string;
+};
+
 export type Trip = {
   id: string;
   name: string;
@@ -119,6 +129,7 @@ export type Trip = {
   style: TripStyle;
   travelers: number;
   notes?: string;
+  itinerary?: ItineraryItem[];
   createdAt: string;
 };
 
