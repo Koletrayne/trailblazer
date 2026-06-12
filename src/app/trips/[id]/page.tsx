@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTrips } from "@/hooks/useTrips";
 import { useParks } from "@/hooks/useParks";
+import { useGeocode } from "@/hooks/useGeocode";
 import { useStatuses } from "@/hooks/useStatuses";
 import TripStopList from "@/components/TripStopList";
 import TripRouteMapWrapper from "@/components/TripRouteMapWrapper";
@@ -26,6 +27,7 @@ export default function TripDetailPage() {
   const [gasPerGallon, setGasPerGallon] = useState(3.6);
 
   const trip = getTrip(id);
+  const startCoord = useGeocode(trip?.startLocation ?? "");
 
   const orderedParks = useMemo(() => {
     if (!trip) return [];
@@ -34,32 +36,15 @@ export default function TripDetailPage() {
       .filter((p): p is NonNullable<typeof p> => Boolean(p));
   }, [trip, parks]);
 
-  const totalMiles = useMemo(() => {
-    if (orderedParks.length < 2) return 0;
-    let m = 0;
-    for (let i = 0; i < orderedParks.length - 1; i++) {
-      const a = orderedParks[i];
-      const b = orderedParks[i + 1];
-      const lat1 = a.latitude, lon1 = a.longitude, lat2 = b.latitude, lon2 = b.longitude;
-      const R = 3958.8;
-      const toRad = (d: number) => (d * Math.PI) / 180;
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-      m += 2 * R * Math.asin(Math.sqrt(h)) * 1.25;
-    }
-    return Math.round(m);
-  }, [orderedParks]);
-
   const cost = useMemo(() => {
     if (!trip) return null;
     return estimateTripCost(
       trip,
       parks.map((p) => ({ parkCode: p.parkCode, latitude: p.latitude, longitude: p.longitude })),
-      null,
+      startCoord ?? null,
       { mpg, gasPerGallon }
     );
-  }, [trip, parks, mpg, gasPerGallon]);
+  }, [trip, parks, startCoord, mpg, gasPerGallon]);
 
   if (loading || trips.length === 0 && !trip) {
     return <div className="p-8 text-bark-500 dark:text-forest-300">Loading…</div>;
@@ -230,9 +215,9 @@ export default function TripDetailPage() {
 
       <div className="grid lg:grid-cols-[1fr_360px] gap-6">
         <div className="space-y-6">
-          <Card title={`Route · ${orderedParks.length} stop${orderedParks.length === 1 ? "" : "s"} · ~${totalMiles} mi`}>
+          <Card title={`Route · ${orderedParks.length} stop${orderedParks.length === 1 ? "" : "s"} · ~${cost?.miles ?? 0} mi`}>
             <div className="mb-4 -mt-1">
-              <TripRouteMapWrapper parks={orderedParks} />
+              <TripRouteMapWrapper parks={orderedParks} startCoord={startCoord} />
             </div>
 
             <TripStopList
