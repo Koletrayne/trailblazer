@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession, signIn, signOut } from "next-auth/react";
 import ThemeToggle from "./ThemeToggle";
+import UserAvatar from "./UserAvatar";
+import { useStored, STORAGE_KEYS, type Profile } from "@/lib/storage";
 
 const NAV_LINKS = [
   { href: "/", label: "Map" },
@@ -19,6 +21,7 @@ export default function NavBar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
+  const [profile] = useStored<Profile>(STORAGE_KEYS.PROFILE, {});
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -49,6 +52,7 @@ export default function NavBar() {
             <AuthButton
               session={session}
               status={status}
+              avatar={profile.avatar}
               dropdownOpen={dropdownOpen}
               setDropdownOpen={setDropdownOpen}
               dropdownRef={dropdownRef}
@@ -92,28 +96,24 @@ export default function NavBar() {
           ))}
           <div className="mt-2 pt-2 border-t border-bark-100 dark:border-forest-800">
             {session ? (
-              <div className="flex items-center justify-between px-3 py-3">
-                <div className="flex items-center gap-2">
-                  {session.user?.image && (
-                    <Image
-                      src={session.user.image}
-                      alt={session.user.name ?? "User"}
-                      width={28}
-                      height={28}
-                      className="rounded-full"
-                    />
-                  )}
-                  <span className="text-sm font-medium text-forest-800 dark:text-forest-100 truncate max-w-[140px]">
+              <>
+                <Link
+                  href="/account"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-3 rounded-lg hover:bg-forest-100 dark:hover:bg-forest-800"
+                >
+                  <UserAvatar avatar={profile.avatar} image={session.user?.image} name={session.user?.name} size={28} />
+                  <span className="text-sm font-medium text-forest-800 dark:text-forest-100 truncate max-w-[160px]">
                     {session.user?.name}
                   </span>
-                </div>
+                </Link>
                 <button
                   onClick={() => { setMenuOpen(false); signOut(); }}
-                  className="text-sm text-bark-500 dark:text-forest-400 hover:text-forest-800 dark:hover:text-forest-100"
+                  className="text-left px-3 py-3 rounded-lg text-sm font-medium text-bark-500 dark:text-forest-400 hover:bg-forest-100 dark:hover:bg-forest-800"
                 >
                   Sign out
                 </button>
-              </div>
+              </>
             ) : (
               <button
                 onClick={() => { setMenuOpen(false); signIn("google"); }}
@@ -133,12 +133,14 @@ export default function NavBar() {
 function AuthButton({
   session,
   status,
+  avatar,
   dropdownOpen,
   setDropdownOpen,
   dropdownRef,
 }: {
   session: ReturnType<typeof useSession>["data"];
   status: ReturnType<typeof useSession>["status"];
+  avatar?: string;
   dropdownOpen: boolean;
   setDropdownOpen: (v: boolean) => void;
   dropdownRef: React.RefObject<HTMLDivElement>;
@@ -166,19 +168,7 @@ function AuthButton({
         className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-forest-100 dark:hover:bg-forest-800 transition-colors"
         aria-label="Account menu"
       >
-        {session.user?.image ? (
-          <Image
-            src={session.user.image}
-            alt={session.user.name ?? "User"}
-            width={30}
-            height={30}
-            className="rounded-full"
-          />
-        ) : (
-          <div className="w-[30px] h-[30px] rounded-full bg-forest-600 text-white text-xs flex items-center justify-center font-bold">
-            {session.user?.name?.[0]?.toUpperCase() ?? "U"}
-          </div>
-        )}
+        <UserAvatar avatar={avatar} image={session.user?.image} name={session.user?.name} size={30} />
         <span className="text-sm font-medium text-forest-800 dark:text-forest-100 max-w-[100px] truncate">
           {session.user?.name?.split(" ")[0]}
         </span>
@@ -193,9 +183,16 @@ function AuthButton({
             <p className="text-xs text-bark-500 dark:text-forest-400">Signed in as</p>
             <p className="text-sm font-medium text-forest-800 dark:text-forest-100 truncate">{session.user?.email}</p>
           </div>
+          <Link
+            href="/account"
+            onClick={() => setDropdownOpen(false)}
+            className="block w-full text-left px-4 py-3 text-sm text-forest-800 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 transition-colors"
+          >
+            Profile &amp; achievements
+          </Link>
           <button
             onClick={() => { setDropdownOpen(false); signOut(); }}
-            className="w-full text-left px-4 py-3 text-sm text-forest-800 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 transition-colors"
+            className="w-full text-left px-4 py-3 text-sm text-forest-800 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 transition-colors border-t border-bark-100 dark:border-forest-800"
           >
             Sign out
           </button>

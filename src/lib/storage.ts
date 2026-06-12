@@ -11,6 +11,10 @@ export type Profile = {
   homeCity?: string;
   homeLat?: number;
   homeLon?: number;
+  /** Custom emoji avatar; overrides the Google photo when set. */
+  avatar?: string;
+  /** Display name override; falls back to the signed-in Google name. */
+  displayName?: string;
 };
 
 function read<T>(key: string, fallback: T): T {
