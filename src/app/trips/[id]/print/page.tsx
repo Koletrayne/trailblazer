@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useParams } from "next/navigation";
 import { useTrips } from "@/hooks/useTrips";
 import { useParks } from "@/hooks/useParks";
+import { useStatuses } from "@/hooks/useStatuses";
 import { CATEGORY_LABEL, CATEGORY_ORDER } from "@/lib/gearRules";
 import { approximateDriveMiles, approximateDriveHours, formatHours } from "@/lib/distance";
 import { estimateTripCost } from "@/lib/tripCost";
@@ -13,6 +14,7 @@ export default function TripPrintPage() {
   const params = useParams<{ id: string }>();
   const { getTrip } = useTrips();
   const { parks } = useParks();
+  const { getStatusObject } = useStatuses();
   const trip = getTrip(params.id);
 
   const orderedParks = useMemo(() => {
@@ -80,6 +82,7 @@ export default function TripPrintPage() {
                     { lat: next.latitude, lon: next.longitude }
                   )
                 : 0;
+              const memory = getStatusObject(p.parkCode)?.memory;
               return (
                 <li key={p.parkCode}>
                   <div className="flex items-start gap-3">
@@ -87,6 +90,11 @@ export default function TripPrintPage() {
                     <div className="flex-1">
                       <div className="font-semibold text-bark-800">{p.fullName}</div>
                       <div className="text-xs text-bark-500">{p.states} · {p.url}</div>
+                      {memory && (
+                        <blockquote className="mt-1 pl-2 border-l-2 border-forest-400 text-xs italic text-bark-600">
+                          &ldquo;{memory}&rdquo;
+                        </blockquote>
+                      )}
                     </div>
                   </div>
                   {next && (

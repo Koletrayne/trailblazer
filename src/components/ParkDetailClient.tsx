@@ -64,7 +64,7 @@ export default function ParkDetailClient({
         <div>
           <Tabs current={tab} onChange={setTab} />
           <div className="mt-6">
-            {tab === "overview" && <OverviewTab park={park} alerts={alerts} />}
+            {tab === "overview" && <OverviewTab park={park} alerts={alerts} memory={statusObj?.memory} />}
             {tab === "hikes" && <HikesTab thingsToDo={thingsToDo} />}
             {tab === "campgrounds" && <CampgroundsTab campgrounds={campgrounds} />}
             {tab === "seasons" && <SeasonsTab parkCode={park.parkCode} />}
@@ -76,6 +76,7 @@ export default function ParkDetailClient({
                 visitedDate={statusObj?.visitedDate}
                 rating={statusObj?.rating}
                 notes={statusObj?.notes}
+                memory={statusObj?.memory}
                 onChange={(patch) => updateStatus(park.parkCode, patch)}
               />
             )}
@@ -184,9 +185,17 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-function OverviewTab({ park, alerts }: { park: Park; alerts: Alert[] }) {
+function OverviewTab({ park, alerts, memory }: { park: Park; alerts: Alert[]; memory?: string }) {
   return (
     <div className="space-y-6">
+      {memory && (
+        <blockquote className="border-l-4 border-forest-400 pl-4 py-1">
+          <p className="text-base italic text-forest-800 dark:text-forest-100 leading-relaxed">
+            &ldquo;{memory}&rdquo;
+          </p>
+          <cite className="text-xs text-bark-500 dark:text-forest-400 not-italic mt-1 block">Your memory</cite>
+        </blockquote>
+      )}
       <p className="text-bark-700 dark:text-forest-200 leading-relaxed">{park.description}</p>
 
       {park.images && park.images.length > 1 && (
@@ -511,18 +520,22 @@ function GearTab({ parkCode }: { parkCode: string }) {
   );
 }
 
+const MEMORY_MAX = 160;
+
 function NotesTab({
   parkCode,
   visitedDate,
   rating,
   notes,
+  memory,
   onChange
 }: {
   parkCode: string;
   visitedDate?: string;
   rating?: number;
   notes?: string;
-  onChange: (patch: { visitedDate?: string; rating?: number; notes?: string }) => void;
+  memory?: string;
+  onChange: (patch: { visitedDate?: string; rating?: number; notes?: string; memory?: string }) => void;
 }) {
   return (
     <div className="space-y-4 max-w-xl">
@@ -549,6 +562,19 @@ function NotesTab({
             </button>
           ))}
         </div>
+      </div>
+      <div>
+        <label className="block text-xs uppercase tracking-wide text-bark-500 dark:text-forest-300 font-semibold mb-1">
+          Memory <span className="normal-case font-normal text-bark-400 dark:text-forest-500">· shown on your profile &amp; print packet</span>
+        </label>
+        <textarea
+          value={memory ?? ""}
+          onChange={(e) => onChange({ memory: e.target.value.slice(0, MEMORY_MAX) })}
+          rows={2}
+          placeholder="One sentence that captures this place…"
+          className="w-full px-3 py-2 rounded border border-bark-200 dark:border-forest-700 bg-white dark:bg-forest-800 text-sm resize-none"
+        />
+        <div className="text-xs text-bark-400 dark:text-forest-500 mt-0.5 text-right">{(memory ?? "").length}/{MEMORY_MAX}</div>
       </div>
       <div>
         <label className="block text-xs uppercase tracking-wide text-bark-500 dark:text-forest-300 font-semibold mb-1">Notes</label>

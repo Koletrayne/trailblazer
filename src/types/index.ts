@@ -79,6 +79,7 @@ export type UserParkStatus = {
   visitedDate?: string;
   notes?: string;
   rating?: number;
+  memory?: string;
 };
 
 export type GearCategory =

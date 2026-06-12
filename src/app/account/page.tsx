@@ -38,6 +38,17 @@ export default function AccountPage() {
   const badges = getBadges();
   const earnedBadges = badges.filter((b) => isBadgeEarned(b, statuses)).length;
 
+  const memories = useMemo(() => {
+    return statuses
+      .filter((s) => s.memory)
+      .map((s) => {
+        const park = parks.find((p) => p.parkCode === s.parkCode);
+        if (!park) return null;
+        return { park, memory: s.memory!, visitedDate: s.visitedDate };
+      })
+      .filter((m): m is NonNullable<typeof m> => m !== null);
+  }, [statuses, parks]);
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div>
@@ -130,6 +141,48 @@ export default function AccountPage() {
         <Stat label="States reached" value={statesReached} />
         <Stat label="Badges earned" value={earnedBadges} />
       </div>
+
+      {/* Memory Wall */}
+      {memories.length > 0 && (
+        <div>
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-display font-bold text-2xl text-forest-800 dark:text-forest-100">Memory wall</h2>
+            <span className="text-sm text-bark-500 dark:text-forest-300">{memories.length} {memories.length === 1 ? "memory" : "memories"}</span>
+          </div>
+          <p className="text-sm text-bark-500 dark:text-forest-300 mt-1 mb-4">
+            Your one-sentence captures from each park you&apos;ve visited.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {memories.map(({ park, memory, visitedDate }) => (
+              <Link
+                key={park.parkCode}
+                href={`/parks/${park.parkCode}`}
+                className="group rounded-xl overflow-hidden bg-white dark:bg-forest-900 border border-bark-100 dark:border-forest-800 shadow-soft hover:border-forest-300 dark:hover:border-forest-600 transition-colors"
+              >
+                {park.images?.[0]?.url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={park.images[0].url}
+                    alt={park.fullName}
+                    className="h-32 w-full object-cover"
+                  />
+                )}
+                <div className="p-3">
+                  <div className="text-xs font-semibold text-bark-500 dark:text-forest-400 uppercase tracking-wide mb-1">
+                    {park.fullName}
+                  </div>
+                  <blockquote className="text-sm italic text-forest-800 dark:text-forest-100 leading-snug">
+                    &ldquo;{memory}&rdquo;
+                  </blockquote>
+                  {visitedDate && (
+                    <div className="text-xs text-bark-400 dark:text-forest-500 mt-2">{visitedDate}</div>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Achievements */}
       <div>
