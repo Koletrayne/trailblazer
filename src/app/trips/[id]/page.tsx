@@ -16,6 +16,7 @@ import { estimateTripCost, type CostOverrides } from "@/lib/tripCost";
 import { currentSeason, seasonForMonth } from "@/lib/seasonRules";
 import { suggestNearbyParks } from "@/lib/nearbyParks";
 import { formatHours } from "@/lib/distance";
+import { buildShareUrl } from "@/lib/shareTrip";
 import type { TripStyle } from "@/types";
 
 export default function TripDetailPage() {
@@ -29,6 +30,7 @@ export default function TripDetailPage() {
   const [mpg, setMpg] = useState(24);
   const [gasPerGallon, setGasPerGallon] = useState(3.6);
   const [view, setView] = useState<"planner" | "itinerary">("planner");
+  const [shareLabel, setShareLabel] = useState("🔗 Share");
 
   const trip = getTrip(id);
   const startCoord = useGeocode(trip?.startLocation ?? "");
@@ -106,6 +108,20 @@ export default function TripDetailPage() {
     for (const code of trip.parkCodes) setStatus(code, "planned");
   }
 
+  async function shareTrip() {
+    if (!trip) return;
+    const url = buildShareUrl(trip, window.location.origin);
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareLabel("✓ Link copied");
+    } catch {
+      window.prompt("Copy this shareable link:", url);
+      setShareLabel("🔗 Share");
+      return;
+    }
+    setTimeout(() => setShareLabel("🔗 Share"), 2000);
+  }
+
   const availableStates = Array.from(
     new Set(
       parks
@@ -168,6 +184,12 @@ export default function TripDetailPage() {
           />
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={shareTrip}
+            className="text-sm bg-cream dark:bg-forest-800 text-forest-800 dark:text-forest-100 font-semibold px-4 py-2 rounded-full border border-bark-200 dark:border-forest-700 hover:bg-bark-50 dark:hover:bg-forest-700"
+          >
+            {shareLabel}
+          </button>
           <Link
             href={`/trips/${trip.id}/print`}
             className="text-sm bg-cream dark:bg-forest-800 text-forest-800 dark:text-forest-100 font-semibold px-4 py-2 rounded-full border border-bark-200 dark:border-forest-700 hover:bg-bark-50 dark:hover:bg-forest-700"
