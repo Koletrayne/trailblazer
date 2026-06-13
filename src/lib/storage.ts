@@ -6,6 +6,7 @@ const STATUSES_KEY = "tb.statuses.v1";
 const TRIPS_KEY = "tb.trips.v1";
 const THEME_KEY = "tb.theme";
 const PROFILE_KEY = "tb.profile.v1";
+const FOG_KEY = "tb.fog.v1";
 
 export type Profile = {
   homeCity?: string;
@@ -74,7 +75,8 @@ export const STORAGE_KEYS = {
   STATUSES: STATUSES_KEY,
   TRIPS: TRIPS_KEY,
   THEME: THEME_KEY,
-  PROFILE: PROFILE_KEY
+  PROFILE: PROFILE_KEY,
+  FOG: FOG_KEY
 };
 
 export function exportAllData(): string {

@@ -19,6 +19,9 @@ export default function ParkMapWrapper(props: {
   onSelect: (p: Park) => void;
   monuments?: Park[];
   onSelectMonument?: (m: Park) => void;
+  fogEnabled?: boolean;
+  reveals?: { lat: number; lon: number }[];
+  journey?: [number, number][];
 }) {
   return <ParkMap {...props} />;
 }

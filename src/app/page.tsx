@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useParks } from "@/hooks/useParks";
 import { useMonuments } from "@/hooks/useMonuments";
 import { useStatuses } from "@/hooks/useStatuses";
+import { useStored, STORAGE_KEYS } from "@/lib/storage";
 import ParkMapWrapper from "@/components/ParkMapWrapper";
 import ParkSidebar from "@/components/ParkSidebar";
 import ParkPreviewModal from "@/components/ParkPreviewModal";
@@ -13,13 +14,32 @@ import type { Park } from "@/types";
 
 export default function HomePage() {
   const { parks, loading } = useParks();
-  const { getStatus } = useStatuses();
+  const { getStatus, getStatusObject } = useStatuses();
   const [selected, setSelected] = useState<Park | null>(null);
   const [selectedMonument, setSelectedMonument] = useState<Park | null>(null);
   const [filters, setFilters] = useState<Filters>({ search: "", state: "", status: "all" });
   const [sheetOpen, setSheetOpen] = useState(false);
   const [showMonuments, setShowMonuments] = useState(false);
+  const [fogEnabled, setFogEnabled] = useStored<boolean>(STORAGE_KEYS.FOG, false);
   const { monuments } = useMonuments(showMonuments);
+
+  const visitedParks = useMemo(
+    () => parks.filter((p) => getStatus(p.parkCode) === "visited"),
+    [parks, getStatus]
+  );
+
+  const reveals = useMemo(
+    () => visitedParks.map((p) => ({ lat: p.latitude, lon: p.longitude })),
+    [visitedParks]
+  );
+
+  const journey = useMemo(() => {
+    return visitedParks
+      .map((p) => ({ p, date: getStatusObject(p.parkCode)?.visitedDate }))
+      .filter((x): x is { p: Park; date: string } => Boolean(x.date))
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map(({ p }) => [p.latitude, p.longitude] as [number, number]);
+  }, [visitedParks, getStatusObject]);
 
   const states = useMemo(() => {
     const s = new Set<string>();
@@ -56,21 +76,45 @@ export default function HomePage() {
           onSelect={setSelected}
           monuments={showMonuments ? monuments : []}
           onSelectMonument={setSelectedMonument}
+          fogEnabled={fogEnabled}
+          reveals={reveals}
+          journey={journey}
         />
 
-        {/* Monument toggle — top right of map */}
-        <button
-          onClick={() => setShowMonuments((o) => !o)}
-          className={`absolute top-3 right-3 z-[1000] flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold shadow-md border transition-colors ${
-            showMonuments
-              ? "bg-amber-600 text-white border-amber-700"
-              : "bg-white dark:bg-forest-800 text-bark-700 dark:text-forest-100 border-bark-200 dark:border-forest-700 hover:bg-cream dark:hover:bg-forest-700"
-          }`}
-          aria-pressed={showMonuments}
-        >
-          <span>🏛</span>
-          <span>{showMonuments ? `Monuments (${monuments.length})` : "Show Monuments"}</span>
-        </button>
+        {/* Toggles — top right of map */}
+        <div className="absolute top-3 right-3 z-[1000] flex flex-col items-end gap-2">
+          <button
+            onClick={() => setFogEnabled((o) => !o)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold shadow-md border transition-colors ${
+              fogEnabled
+                ? "bg-forest-800 text-white border-forest-900"
+                : "bg-white dark:bg-forest-800 text-bark-700 dark:text-forest-100 border-bark-200 dark:border-forest-700 hover:bg-cream dark:hover:bg-forest-700"
+            }`}
+            aria-pressed={fogEnabled}
+          >
+            <span>🌫</span>
+            <span>{fogEnabled ? `Fog of War · ${visitedParks.length} cleared` : "Fog of War"}</span>
+          </button>
+          <button
+            onClick={() => setShowMonuments((o) => !o)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold shadow-md border transition-colors ${
+              showMonuments
+                ? "bg-amber-600 text-white border-amber-700"
+                : "bg-white dark:bg-forest-800 text-bark-700 dark:text-forest-100 border-bark-200 dark:border-forest-700 hover:bg-cream dark:hover:bg-forest-700"
+            }`}
+            aria-pressed={showMonuments}
+          >
+            <span>🏛</span>
+            <span>{showMonuments ? `Monuments (${monuments.length})` : "Show Monuments"}</span>
+          </button>
+        </div>
+
+        {/* Fog hint when nothing is cleared yet */}
+        {fogEnabled && visitedParks.length === 0 && (
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] bg-forest-900/90 text-forest-50 text-xs px-4 py-2 rounded-full shadow-lg max-w-[90%] text-center">
+            Mark parks as visited to clear the fog and reveal the map around them.
+          </div>
+        )}
 
         {/* Floating button to open parks list on mobile */}
         <button
